@@ -54,7 +54,8 @@ void Compare_VTK(char* source_poly_fn, char* target_poly_fn, char* output_txt, c
   double xyz_target[3];
   int closestPointID; 
   vector<double> target_scalars_hit;
-  double target_scalar;
+  vector<double> source_scalars_list;
+  double target_scalar, source_scalar;
 
   vtkSmartPointer<vtkPolyData> source_poly =vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkPolyData> target_poly =vtkSmartPointer<vtkPolyData>::New();  
@@ -88,6 +89,9 @@ void Compare_VTK(char* source_poly_fn, char* target_poly_fn, char* output_txt, c
 
   vtkSmartPointer<vtkFloatArray> target_scalars = vtkSmartPointer<vtkFloatArray>::New();
   target_scalars = vtkFloatArray::SafeDownCast(target_poly->GetPointData()->GetScalars());
+
+   vtkSmartPointer<vtkFloatArray> source_scalars = vtkSmartPointer<vtkFloatArray>::New();
+  source_scalars = vtkFloatArray::SafeDownCast(source_poly->GetPointData()->GetScalars());
   
 
   
@@ -105,6 +109,11 @@ void Compare_VTK(char* source_poly_fn, char* target_poly_fn, char* output_txt, c
               target_scalar = target_scalars->GetTuple1(closestPointID);
               target_scalars_hit.push_back(target_scalar);
               target_scalar_to_indicate_visited->SetTuple1(closestPointID, 1);
+
+              // recording the source scalar 
+              source_scalar = source_scalars->GetTuple1(i);
+              source_scalars_list.push_back(source_scalar);
+
               
           } 
       }
@@ -117,10 +126,14 @@ void Compare_VTK(char* source_poly_fn, char* target_poly_fn, char* output_txt, c
   // writing target scalars that were hit to file 
   ofstream output; 
   output.open(output_txt);
+  output << "Source point,Target point,Difference (S-T)\n";
+  output << "============,============,================\n";
 
   for (int i=0;i<target_scalars_hit.size();i++)
   {
-      output << target_scalars_hit[i] << endl; 
+      double diff = fabs(source_scalars_list[i]-target_scalars_hit[i]);
+      if (source_scalars_list[i] > 0)
+        output <<  source_scalars_list[i] << "," << target_scalars_hit[i] << "," << diff  << endl; 
   }
 
   output.close();
