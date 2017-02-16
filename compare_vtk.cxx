@@ -152,7 +152,7 @@ int main(int argc, char **argv)
    
   if (argc != 5)
   {
-     cerr << "Not enough parameters\nUsage: <source.vtk> <target.vtk> <output.txt> <output.vtk>"<< endl; 
+     cerr << "Not enough parameters\nUsage: <source.vtk> <target.vtk> <output.csv> <output.vtk>"<< endl; 
      exit(1);
   }
   
